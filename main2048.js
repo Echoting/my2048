@@ -1,31 +1,41 @@
 var board = new Array();
 var score = 0;
 var hasConflicted = new Array();
+
+var startX = 0;
+var startY = 0;
+var endX = 0;
+var endY = 0;
 $(document).ready(function(){
+	prepareForMobile();
 	newgame();
 });
 $(document).keydown(function(event){
 	var event = event||window.event;
 	switch(event.keyCode){
 		case 37: //left
+			event.preventDefault();
 			if(moveLeft()){
 				setTimeout("generateOneNumber()",210);
 				setTimeout("isGameover()",300);
 			}
 			break;
 		case 38: //up
+			event.preventDefault();
 			if(moveUp()){
 				setTimeout("generateOneNumber()",210);
 				setTimeout("isGameover()",300);
 			}
 			break;
 		case 39: //right
+			event.preventDefault();
 			if(moveRight()){
 				setTimeout("generateOneNumber()",210);
 				setTimeout("isGameover()",300);
 			}
 			break;
 		case 40: //down
+			event.preventDefault();
 			if(moveDown()){
 				setTimeout("generateOneNumber()",210);
 				setTimeout("isGameover()",300);
@@ -36,6 +46,71 @@ $(document).keydown(function(event){
 
 	}
 });
+
+document.addEventListener('touchstart',function(event){
+	startX = event.touches[0].pageX;
+	startY = event.touches[0].pageY;
+});
+document.addEventListener('touchmove',function(event){
+	event.preventDefault();
+})
+document.addEventListener('touchend',function(event){
+	endX = event.changedTouches[0].pageX;
+	endY = event.changedTouches[0].pageY;
+	var deltaX = endX - startX;
+	var deltaY = endY - startY;
+	if(Math.abs(deltaX)<0.1*documentWidth&&Math.abs(deltaY)<0.1*documentWidth){
+		return;
+	}
+	//x
+	if(Math.abs(deltaX)>= Math.abs(deltaY)){
+		if(deltaX>0){
+			//moveRight
+			if(moveRight()){
+				setTimeout("generateOneNumber()",210);
+				setTimeout("isGameover()",300);
+			}
+		}else{
+			//moveLeft
+			if(moveLeft()){
+				setTimeout("generateOneNumber()",210);
+				setTimeout("isGameover()",300);
+			}
+		}
+	}
+	//y
+	else{
+		if(deltaY>0){
+			//moveDown
+			if(moveDown()){
+				setTimeout("generateOneNumber()",210);
+				setTimeout("isGameover()",300);
+			}
+		}else{
+			//moveUp
+			if(moveUp()){
+				setTimeout("generateOneNumber()",210);
+				setTimeout("isGameover()",300);
+			}
+		}
+	}
+});
+
+function prepareForMobile(){
+	if(documentWidth>500){
+		gridContainerWidth = 500;
+		cellSpace = 20;
+		cellSideLength = 100;
+	}
+	$('#grid_container').css('width',gridContainerWidth-2*cellSpace);
+	$('#grid_container').css('height',gridContainerWidth-2*cellSpace);
+	$('#grid_container').css('padding',cellSpace);
+	$('#grid_container').css('border-radius',0.02*gridContainerWidth);
+
+	$('.grid_cell').css('width',cellSideLength);
+	$('.grid_cell').css('height',cellSideLength);
+	$('.grid_cell').css('border-radius',0.02*cellSideLength);
+}
 function newgame(){
 	//初始化格子
 	init();
@@ -73,11 +148,11 @@ function updateBoardView(){
 			if(board[i][j]==0){
 				numberCell.css('width','0px');
 				numberCell.css('height','0px');
-				numberCell.css('top',getPosTop(i,j)+50);//放在中间
-				numberCell.css('left',getPosLeft(i,j)+50);
+				numberCell.css('top',getPosTop(i,j)+ cellSideLength/2);//放在中间
+				numberCell.css('left',getPosLeft(i,j)+cellSideLength/2);
 			}else{
-				numberCell.css('width','100px');
-				numberCell.css('height','100px');
+				numberCell.css('width',cellSideLength);
+				numberCell.css('height',cellSideLength);
 				numberCell.css('top',getPosTop(i,j));
 				numberCell.css('left',getPosLeft(i,j));
 				numberCell.css('background-color',getNumberBackgorundColor(board[i][j]));
@@ -87,6 +162,8 @@ function updateBoardView(){
 			hasConflicted[i][j] = false;
 		}
 	}
+	$('.number_cell').css('line-height',cellSideLength+'px');
+	$('.number_cell').css('font-size',0.6*cellSideLength+'px');
 }
 
 function generateOneNumber(){
