@@ -120,6 +120,7 @@ function newgame(){
 }
 function init(){
 	score = 0;
+	updateScore(score);
 	//初始化每个表格的位置
 	for(var i=0; i<4; i++){
 		for(var j=0; j<4; j++){
