@@ -119,6 +119,7 @@ function newgame(){
 	generateOneNumber();
 }
 function init(){
+	score = 0;
 	//初始化每个表格的位置
 	for(var i=0; i<4; i++){
 		for(var j=0; j<4; j++){
